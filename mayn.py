@@ -1,5 +1,6 @@
 import time
 import random
+import os
 
 # --- Clase de Lógica de la IA ---
 class VisualBrain:
@@ -11,8 +12,11 @@ class VisualBrain:
             "escaneo_silencioso": 50
         }
 
-    def get_best_action(self):
-        # Elige la acción con mayor puntaje en memoria (o una al azar para explorar)
+    def get_best_action(self, epsilon=0.1):
+        # Exploración vs Explotación (epsilon-greedy)
+        if random.random() < epsilon:
+            return random.choice(list(self.memory.keys()))
+        # Elige la acción con mayor puntaje en memoria
         return max(self.memory, key=self.memory.get)
 
     def learn(self, action, reward):
@@ -22,8 +26,8 @@ class VisualBrain:
         self.memory[action] = max(0, min(self.memory[action], 200))
 
     def draw_dashboard(self, action, status):
-        # Limpia la pantalla (funciona en la Konsole de Kubuntu)
-        print("\033[H\033[J") 
+        # Limpia la pantalla (multiplataforma)
+        os.system('clear' if os.name == 'posix' else 'cls')
         print("="*45)
         print(f" SIMULADOR DE LÓGICA EN CIBERSEGURIDAD ")
         print("="*45)
@@ -46,7 +50,8 @@ def simulate_penetration_step(action):
         return "pwned" if prob > 0.4 else "detectado"
     
     if action == "fuerza_bruta":
-        return "bloqueado" if prob > 0.2 else "pwned"
+        # CORREGIDO: Lógica invertida - ahora 80% de éxito
+        return "pwned" if prob > 0.2 else "bloqueado"
     
     if action == "escaneo_silencioso":
         return "limpio" # El escaneo casi siempre pasa desapercibido
@@ -68,7 +73,7 @@ def calculate_reward(outcome):
 def main():
     brain = VisualBrain()
     
-    print("Iniciando entorno de pruebas en Kubuntu...")
+    print("Iniciando entorno de pruebas...")
     time.sleep(1)
     
     try:
